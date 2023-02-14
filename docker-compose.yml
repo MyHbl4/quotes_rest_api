@@ -1,0 +1,22 @@
+version: '3.5'
+services:
+  h2:
+    image: 'oscarfonts/h2'
+    container_name: 'h2'
+    hostname: 'h2'
+
+  app:
+    build: ./
+    container_name: 'quotes_rest_api'
+    ports:
+      - "8080:8080"
+    depends_on:
+      - h2
+      - liquibase
+
+  liquibase:
+    image: 'liquibase/liquibase'
+    container_name: liquibase
+    depends_on:
+      - h2
+    hostname: liquibase
