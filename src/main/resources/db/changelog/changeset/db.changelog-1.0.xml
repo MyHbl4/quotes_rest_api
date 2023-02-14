@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd"
+  objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+  <changeSet id="create ROLES" author="aleksandr">
+    <sql>
+      create table ROLES
+      (
+        ID          BIGINT auto_increment primary key,
+        NAME        CHARACTER VARYING(255)
+      );
+    </sql>
+  </changeSet>
+  <changeSet id="create USERS" author="aleksandr">
+    <sql>
+      create table USERS
+      (
+        ID          BIGINT auto_increment not null primary key,
+        DATE_CREATE DATE not null ,
+        EMAIL       CHARACTER VARYING(255) not null unique,
+        ENABLED     BOOLEAN not null,
+        PASSWORD    CHARACTER VARYING(255) not null ,
+        NAME    CHARACTER VARYING(255) not null unique
+      );
+    </sql>
+  </changeSet>
+  <changeSet id="create USERS_ROLES" author="aleksandr">
+    <sql>
+      create table USERS_ROLES
+      (
+        USER_ID     BIGINT not null references USERS (ID),
+        ROLE_ID     BIGINT not null references ROLES (ID),
+        primary key (USER_ID, ROLE_ID)
+      );
+    </sql>
+  </changeSet>
+  <changeSet id="create QUOTES" author="aleksandr">
+    <sql>
+      create table QUOTES
+      (
+        ID          BIGINT auto_increment not null primary key,
+        DATE_CREATE DATE,
+        DATE_UPDATE DATE,
+        SCORE       INT,
+        DESCRIPTION CHARACTER VARYING(255),
+        USER_ID     BIGINT references USERS (ID)
+      );
+    </sql>
+  </changeSet>
+  <changeSet id="create VOTES" author="aleksandr">
+    <sql>
+      create table VOTES
+      (
+        ID          BIGINT auto_increment not null primary key,
+        DATE_CREATE DATE,
+        VOICE       INT,
+        QUOTE_ID    BIGINT references QUOTES (ID),
+        USER_ID     BIGINT references USERS (ID),
+        UNIQUE (QUOTE_ID, USER_ID)
+      );
+    </sql>
+  </changeSet>
+  <changeSet id="insert ROLES" author="aleksandr">
+    <sql>
+        insert into roles(id, name)
+        values (1, 'ROLE_ADMIN');
+        insert into roles(id, name)
+        values (2, 'ROLE_USER');
+    </sql>
+  </changeSet>
+  <changeSet id="insert USER" author="aleksandr">
+    <sql>
+        insert into users(id, email, name, password, enabled, date_create)
+        values (1, 'admin@gmail.com', 'admin', '$2a$12$YmW0eg2h2y74OtXm.7VukevsJsE1mPtBfuksj9UFIrh15qRWjODru', true, '2023-01-01');
+        insert into users(id, email, name, password, enabled, date_create)
+        values (2, 'user@gmail.com', 'user', '$2a$12$MQMlMECTRojxzv.duTmb.ed4PJxBrTffRBh5izhzDpcglfb.ltb0a', true, '2023-01-01');
+    </sql>
+  </changeSet>
+  <changeSet id="insert USERS_ROLES" author="aleksandr">
+    <sql>
+        insert into users_roles(user_id, role_id)
+        values (1, 1);
+        insert into users_roles(user_id, role_id)
+        values (1, 2);
+        insert into users_roles(user_id, role_id)
+        values (2, 2);
+    </sql>
+  </changeSet>
+</databaseChangeLog>
